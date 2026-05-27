@@ -17,6 +17,9 @@ private:
         ++layer;
       } else if (*ptr == ']') {
         --layer;
+        if (layer < 0b0u) {
+          return false;
+        }
       }
     }
     if (!layer) {
