@@ -11,7 +11,7 @@ private:
   uint8_t* memory_;
   const char* code_;
   bool check_closures_(void) const {
-    signed long long layer = static_cast<decltype(layer)>(NULL);
+    int64_t layer = static_cast<decltype(layer)>(NULL);
     for (const char* ptr = code_; *ptr != '\0'; ++ptr) {
       if (*ptr == '[') {
         ++layer;
@@ -24,8 +24,19 @@ private:
     }
     return false;
   }
-  [[gnu::always_inline]] inline void jump_out_(const char* code_ptr) {
-    
+  [[gnu::always_inline]] inline void jump_over_(const char*& code_ptr) {
+    size_t layer{static_cast<decltype(layer)>(NULL)};
+    while (true) {
+      ++code_ptr;
+      if (*code_ptr == '[') {
+        ++layer;
+      } else if (*code_ptr == ']') {
+        if (layer == 0b0u) {
+          return;
+        }
+        --layer;
+      }
+    }
   }
 public:
   interpreter(uint8_t* memory, const char* code) : memory_(memory), code_(code) {
@@ -56,8 +67,8 @@ public:
         scanf("%c", mem_ptr); 
       } else if (*code_ptr == '[') {
         if (!*mem_ptr) {
-          for (; *code_ptr != ']'; ++code_ptr) {
-          }
+          jump_over_(code_ptr);
+          printf("%c\n", *code_ptr);
         } else {
           closures_stack.push(code_ptr);
         }
@@ -82,7 +93,7 @@ public:
 
 int main(void) {
   uint8_t memory[MEMORY_SIZE]{};
-  char code[] = "[ [+-] ]"; // BRUH
+  char code[] = "] +++ ["; // BRUH
   interpreter itpr(memory, code);
   if (itpr.interpret()) {
     printf("\n");
