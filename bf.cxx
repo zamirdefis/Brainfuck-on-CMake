@@ -71,7 +71,6 @@ public:
       } else if (*code_ptr == '[') {
         if (!*mem_ptr) {
           jump_over_(code_ptr);
-          printf("%c\n", *code_ptr);
         } else {
           closures_stack.push(code_ptr);
         }
@@ -96,11 +95,12 @@ public:
 
 int main(void) {
   uint8_t memory[MEMORY_SIZE]{};
-  char code[] = "] +++ ["; // BRUH
+  char code[] = "+ [ + [ + [ - ] ] ]"; // BRUH
+  printf("%s\n\n", code);
   interpreter itpr(memory, code);
   if (itpr.interpret()) {
     printf("\n");
-    itpr.print_mem(1);
+    itpr.print_mem(10);
   } else {
     printf("BRUH! >_<\n");
   }
