@@ -5,6 +5,7 @@ project("interpreter")
 include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ascii.cmake")
 
+set(dbg)
 
 function(check_closures_ code_name rtn)
   string(LENGTH ${${code_name}} max_index)
@@ -133,6 +134,7 @@ function(interpret memory_name code_name rtn)
   message("${output_buffer}") 
   set(${memory_name} "${${memory_name}}" PARENT_SCOPE)
   set(${rtn} TRUE PARENT_SCOPE)
+  set(dbg ${mem_offset} PARENT_SCOPE)
 endfunction()
 
 function(mem_view memory_name size)
@@ -147,12 +149,15 @@ endfunction()
 
 function(entry)
   if (NOT (DEFINED code))
-    set(code ",>,") 
+    set(code "+++++ +++++ [ > +++++ ++ > +++++ +++++ > +++ > + <<<< - ] >> ++++ . ---- < ++  > + . +++++ ++ . . < +++++++ . > +++++++++++ . < . > ----- . ------ . -------- .")
   endif()
 
   malloc(200 memory)
   interpret(memory code rtn)
-  mem_view(memory 5)
+  mem_view(memory 10)
+
+  inc(dbg)
+  message("${dbg}")
 
   if(NOT ${rtn})
     message(FATAL_ERROR "Error during interpretation")

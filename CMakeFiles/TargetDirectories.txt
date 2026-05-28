@@ -1,2 +1,0 @@
-/home/loksuf/files/cpp/bf_on_cmake/CMakeFiles/edit_cache.dir
-/home/loksuf/files/cpp/bf_on_cmake/CMakeFiles/rebuild_cache.dir
