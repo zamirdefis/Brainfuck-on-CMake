@@ -95,7 +95,7 @@ public:
 
 int main(void) {
   uint8_t memory[MEMORY_SIZE]{};
-  char code[] = "+ [ + [ + [ - ] ] ]"; // BRUH
+  char code[] = "+-[]"; // BRUH
   printf("%s\n\n", code);
   interpreter itpr(memory, code);
   if (itpr.interpret()) {
