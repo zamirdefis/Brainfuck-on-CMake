@@ -1,3 +1,8 @@
+
+//
+// The cpp directory does not appear anywhere in the interpretation and was created to make it easier to port BF from cpp to cmake
+//
+
 #include <stdio.h>
 #include <cstdlib>
 #include <cstdint>
