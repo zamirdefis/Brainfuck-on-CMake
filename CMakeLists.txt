@@ -23,10 +23,12 @@ function(malloc size memory_list)
   set(${memory_list} "${tmp_list}" PARENT_SCOPE)
 endfunction()
 
-function(check_closures_ tokens_name rtn)
+function(check_closures_ code_name rtn)
+  string(LENGTH ${${code_name}} max_index)
+  dec(max_index)
   set(layer 0)
-  foreach(el ${${tokens_name}})
-message("${el}")
+  foreach(index RANGE 0 ${max_index})
+    string(SUBSTRING ${${code_name}} ${index} 1 el) 
     if("${el}" STREQUAL "[")
       inc(layer)
     elseif("${el}" STREQUAL "]")
@@ -44,32 +46,25 @@ message("${el}")
   set(${rtn} TRUE PARENT_SCOPE)
 endfunction()
 
-function(interpret tokens_name rtn)
-  check_closures_(${tokens_name} rtn)
+function(interpret code_name rtn)
+  check_closures_(${code_name} cc_rtn)
   
-  if(NOT rtn)
-    message(WARNING "Invalid Closures!")
-    set(${rtn} FALSE PARENT_SCOPE)
-    return()
+  if(NOT ${cc_rtn})
+    message(SEND_ERROR "Invalid Closures!")
   endif()
-  set(${rtn} TRUE PARENT_SCOPE)
+  set(${rtn} ${cc_rtn} PARENT_SCOPE)
 endfunction()
 
 function(entry)
-  set(string_code "++>-->++++.")
-  string(REGEX REPLACE "(.)" "\\1;" tokens "${string_code}")
 
-  list(LENGTH tokens list_len)
-message("${list_len}")
-  
+  set(code "++>-->++++.")
   malloc(200 memory_list)
+  interpret(code rtn)
 
-
-
-  interpret(tokens rtn)
-  if(NOT rtn)
+  if(NOT ${rtn})
     message(FATAL_ERROR "Error during interpretation")
   endif()
+
 endfunction()
 
 entry()
