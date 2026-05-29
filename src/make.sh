@@ -1,1 +1,2 @@
-cmake -G "Ninja Multi-Config" -S . -B ../build "$@"
+#!/bin/bash
+cmake -G "Ninja Multi-Config" -S . -B "../build" "$@"

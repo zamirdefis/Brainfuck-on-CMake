@@ -19,6 +19,26 @@ function(list_set_at list_name index value)
   set(${list_name} "${${list_name}}" PARENT_SCOPE)
 endfunction()
 
+#  string
+function(string_insert_at src_string_name index string_to_insert)
+  string(LENGTH "${${src_string_name}}" src_string_len)
+  if(${src_string_len} LESS_EQUAL ${index})
+    string(APPEND ${src_string_name} "${string_to_insert}")
+    set(${src_string_name} "${${src_string_name}}" PARENT_SCOPE)
+    return()
+  elseif(${index} EQUAL 0)
+    string(PREPEND ${src_string_name} "${string_to_insert}")
+    set(${src_string_name} "${${src_string_name}}" PARENT_SCOPE)
+    return()
+  endif()
+  string(SUBSTRING "${${src_string_name}}" 0 ${index} string_left)
+  math(EXPR piece_size "${src_string_len} - ${index}")
+  string(SUBSTRING "${${src_string_name}}" ${index} ${piece_size} string_right)
+  string(APPEND string_left "${string_to_insert}")
+  string(APPEND string_left "${string_right}")
+  set(${src_string_name} "${string_left}" PARENT_SCOPE)
+endfunction()
+
 # MEM
 
 function(malloc size memory_list)
