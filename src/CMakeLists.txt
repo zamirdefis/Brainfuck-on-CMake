@@ -21,9 +21,6 @@ set(break_point_char "B") # Breakpoint symbol in the code (does not work unless 
 #   && If code_view is not defined, it sets it to "ON"
 #   && If cell_trace is not defined, it sets it to "ON"
 
-
-
-
 foreach(var_name code source input size memory_view code_view debug cell_trace)
   if(DEFINED ${var_name})
     set(${var_name} "${${var_name}}")
@@ -81,32 +78,36 @@ function(check_closures_ code_name rtn)
   set(${rtn} TRUE PARENT_SCOPE)
 endfunction()
 
-set(cell_trace_color_pack "fg_white" "fg_cyan" "fg_green" "fg_yellow")
+set(cell_trace_color_pack "fg_h_black" "fg_cyan" "fg_green" "fg_yellow")
 
-function(set_cell_colors cell_indexes_name str_mem_name color_pack_name)
-
+# I already have no idea how this spaghetti code works! Why didn’t I do this using regex? - Because colors break everything >:[
+function(set_cell_colors cell_indexes_name str_mem_name color_pack_name cell_offset)
   string(REGEX REPLACE "^\\|" "" clean_str "${${str_mem_name}}")
   string(REGEX REPLACE "\\|$" "" clean_str "${clean_str}")
   string(REPLACE "|" ";" cell_list "${clean_str}")
 
   list(LENGTH cell_list cell_list_len)
   list(LENGTH ${cell_indexes_name} cell_indexes_len)
-  
-  if(${cell_indexes_len} EQUAL 0)
-    return()
-  endif()
+
   set(${str_mem_name} "|")
 
   dec(cell_indexes_len)
   dec(cell_list_len)
-  
   foreach(index RANGE ${cell_list_len})
     list(GET cell_list ${index} el)
     set(colored FALSE)
+    if(${index} EQUAL ${cell_offset})
+      string(APPEND ${str_mem_name} "${fg_red}${el}${nc}|")
+      if(${cell_indexes_len} EQUAL 0)
+        return()
+      endif()
+      continue()
+    endif()
     foreach(stack_index RANGE ${cell_indexes_len} 0 -1)
       list(GET ${cell_indexes_name} ${stack_index} cell_index)
       if(${index} EQUAL ${cell_index})
-        list(GET ${color_pack_name} ${stack_index} color_name)
+        math(EXPR color_index "${color_pack_len} - 1 - ${cell_indexes_len} + ${stack_index}")
+        list(GET ${color_pack_name} ${color_index} color_name)
         string(APPEND ${str_mem_name} "${${color_name}}${el}${nc}|")
         set(colored TRUE)
         break()
@@ -125,14 +126,17 @@ function(func_memory_view memory_name size cell_offset cell_trace_stack_name)
   foreach(index RANGE ${size})
     list(GET ${memory_name} ${index} el)
     if(${index} EQUAL ${cell_offset})
-      string(APPEND str_mem "${fg_h_red}> ${el} <${nc}|") 
+      if(cell_trace) # workaround (crutch) X_X
+        string(APPEND str_mem "> ${el} <|") 
+      else()
+        string(APPEND str_mem "${fg_h_red}> ${el} <${nc}|") 
+      endif()
       continue()
     endif()
     string(APPEND str_mem "${el}|") 
   endforeach()
-
-  if(DEFINED cell_trace)
-    set_cell_colors(${cell_trace_stack_name} str_mem cell_trace_color_pack)
+  if(cell_trace)
+    set_cell_colors(${cell_trace_stack_name} str_mem cell_trace_color_pack ${cell_offset})
   endif()
   message("${str_mem}")
 endfunction()
