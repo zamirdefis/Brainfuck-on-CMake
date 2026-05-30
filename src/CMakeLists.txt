@@ -20,7 +20,7 @@ set(max_code_view 20)
 # debug => Enables breakpoints | "debug" can be set to "drop" so that the first breakpoint completely halts execution
 #   && If memory_view is undefined, it sets it to "dynamic"
 #   && If code_view is not defined, it sets it to "ON"
-#   && If cell_trace is not defined, it sets it to "ON"
+#   && If cell_trace is not defined, it sets it to "ON
 
 foreach(var_name code source input size memory_view code_view debug cell_trace)
   if(DEFINED ${var_name})
@@ -94,6 +94,8 @@ function(set_cell_colors cell_indexes_name str_mem_name color_pack_name cell_off
 
   dec(cell_indexes_len)
   dec(cell_list_len)
+  list(LENGTH ${color_pack_name} color_pack_len)
+
   foreach(index RANGE ${cell_list_len})
     list(GET cell_list ${index} el)
     set(colored FALSE)
@@ -114,7 +116,7 @@ function(set_cell_colors cell_indexes_name str_mem_name color_pack_name cell_off
         break()
       endif()
     endforeach()
-    if(NOT ${colored})
+    if(NOT colored)
       string(APPEND ${str_mem_name} "${el}|")
     endif()
   endforeach()
@@ -164,7 +166,7 @@ macro(macro_code_view)
     if(${code_part_len} GREATER ${max_code_view})
       math(EXPR sep_index "${code_part_len} - ${max_code_view}")
       string(SUBSTRING ${code_part} ${sep_index} ${max_code_view} code_part)
-      set(more "... ")
+      set(more "&&& ")
     endif()
     
     message("${more}${code_part} (<= ${char_pos} char)")
@@ -299,6 +301,7 @@ function(interpret memory_name code_name last_cell_name rtn)
     elseif(("${instruction}" STREQUAL ${break_point_char}) AND (DEFINED debug))
       if(${debug} STREQUAL "drop")
         interpreter_rtn()
+        message("FKLDSFJDG")
       endif()
       macro_memory_view()
       inc(char_pos)
