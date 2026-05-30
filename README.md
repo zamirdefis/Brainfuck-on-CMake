@@ -1,6 +1,6 @@
 # Brainfuck-on-CMake - CMake Brainfuck Interpreter
 
-An advanced **Brainfuck** interpreter written entirely in the declarative **CMake** scripting language.
+An advanced **Brainfuck** interpreter written entirely in the declarative **CMake** scripting language
 
 > Made just for fun, don't take it too seriously - the entire codebase is pure spaghetti! :3
 
