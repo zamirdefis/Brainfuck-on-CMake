@@ -8,6 +8,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/ascii.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/colorful.cmake")
 
 set(break_point_char "B") # Breakpoint symbol in the code (does not work unless the "debug" parameter is specified)
+set(max_code_view 20)
 
 # code => The code that the interpreter must execute
 # source (path to file) File with code (if this parameter is specified, the "code" parameter will be ignored
@@ -17,7 +18,7 @@ set(break_point_char "B") # Breakpoint symbol in the code (does not work unless 
 # code_view => ON/OFF | With debugging enabled, the output is sequential
 # cell_trace => Enables highlighting of the last 4 cells
 # debug => Enables breakpoints | "debug" can be set to "drop" so that the first breakpoint completely halts execution
-#   && If "memory_view" is undefined, it sets it to "dynamic"
+#   && If memory_view is undefined, it sets it to "dynamic"
 #   && If code_view is not defined, it sets it to "ON"
 #   && If cell_trace is not defined, it sets it to "ON"
 
@@ -155,11 +156,18 @@ macro(macro_memory_view)
 endmacro()
 
 macro(macro_code_view)
-  if(${code_view})
-    set(sub_len ${code_offset})
-    inc(sub_len)
-    string(SUBSTRING ${${code_name}} 0 ${sub_len} code_part)
-    message("${code_part}")
+  if(code_view)
+    string(SUBSTRING ${${code_name}} 0 ${char_pos} code_part)
+    string(LENGTH "${code_part}" code_part_len)
+
+    set(more "")
+    if(${code_part_len} GREATER ${max_code_view})
+      math(EXPR sep_index "${code_part_len} - ${max_code_view}")
+      string(SUBSTRING ${code_part} ${sep_index} ${max_code_view} code_part)
+      set(more "... ")
+    endif()
+    
+    message("${more}${code_part} (<= ${char_pos} char)")
   endif()
 endmacro()
 
@@ -197,6 +205,7 @@ function(interpret memory_name code_name last_cell_name rtn)
   set(max_mem_offset 0)
   set(previous_mem_offset 0)
   set(code_offset 0)
+  set(char_pos 0)
   string(LENGTH "${${code_name}}" code_end)
   set(output_buffer "")
 
@@ -243,11 +252,17 @@ function(interpret memory_name code_name last_cell_name rtn)
       endif()
     #=====
     elseif("${instruction}" STREQUAL ",")
-      string(LENGTH ${input_buffer} input_buffer_len)
-      if(input_buffer_len LESS_EQUAL input_offset)
+      if("${input_buffer}" STREQUAL "")
         message(SEND_ERROR "Input overflow")
         set(${rtn} TRUE PARENT_SCOPE)
         return()
+      else()
+        string(LENGTH ${input_buffer} input_buffer_len)
+        if(input_buffer_len LESS_EQUAL input_offset)
+          message(SEND_ERROR "Input overflow")
+          set(${rtn} TRUE PARENT_SCOPE)
+          return()
+        endif()
       endif()
       set(char_data "")
       string(SUBSTRING "${input_buffer}" ${input_offset} 1 char_data)
@@ -280,12 +295,15 @@ function(interpret memory_name code_name last_cell_name rtn)
       else()
         stack_pop(closures_stack)
       endif()
+    #=====
     elseif(("${instruction}" STREQUAL ${break_point_char}) AND (DEFINED debug))
       if(${debug} STREQUAL "drop")
         interpreter_rtn()
       endif()
       macro_memory_view()
+      inc(char_pos)
       macro_code_view()
+      dec(char_pos)
     endif()
 
     if(cell_trace)
@@ -298,8 +316,10 @@ function(interpret memory_name code_name last_cell_name rtn)
       endif()
     endif()
     inc(code_offset)
+    set(char_pos ${code_offset})
   endwhile()
 
+  dec(char_pos)
   interpreter_rtn()
 endfunction()
 
