@@ -15,8 +15,12 @@ set(break_point_char "B") # Breakpoint symbol in the code (does not work unless 
 # size => Number of cells
 # memory_view => -Dmemory_view == dynamic; -Dmemory_view=123 == static (Show only 123 cells); -Dmemory_view=OFF == Disables the memory view window
 # code_view => ON/OFF | With debugging enabled, the output is sequential
-# debug => Enables breakpoints && If "memory_view" is undefined, it sets it to "dynamic" && If code_view is not defined, it sets it to "ON" && "debug" can be set to "drop" so that the first breakpoint completely halts execution
-# cell_trace =>
+# cell_trace => Enables highlighting of the last 4 cells
+# debug => Enables breakpoints | "debug" can be set to "drop" so that the first breakpoint completely halts execution
+#   && If "memory_view" is undefined, it sets it to "dynamic"
+#   && If code_view is not defined, it sets it to "ON"
+#   && If cell_trace is not defined, it sets it to "ON"
+
 
 
 
