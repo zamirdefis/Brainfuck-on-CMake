@@ -4,7 +4,7 @@ An advanced **Brainfuck** interpreter written entirely in the declarative **CMak
 
 > Made just for fun, don't take it too seriously - the entire codebase is pure spaghetti! :3
 
-![res/imgs/screenshot.png]
+![](https://github.com/zamirdefis/Brainfuck-on-CMake/blob/main/res/imgs/screenshot.png)
 
 ---
 
